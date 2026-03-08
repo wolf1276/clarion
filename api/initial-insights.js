@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { HfInference } from '@huggingface/inference';
 
 export default async function handler(req, res) {
   // CORS setup for local dev, Vercel handles it in production
@@ -24,16 +24,17 @@ export default async function handler(req, res) {
     return res.status(400).json({ success: false, message: 'Schema is required' });
   }
 
-  const apiKey = process.env.GOOGLE_API_KEY;
-  console.log("Vercel Insights Debug: GOOGLE_API_KEY exists?", !!apiKey);
+  const hfToken = process.env.HF_TOKEN;
 
-  if (!apiKey) {
-    return res.status(500).json({ success: false, message: 'GOOGLE_API_KEY is not configured on the server.' });
+  if (!hfToken) {
+    return res.status(500).json({ success: false, message: 'HF_TOKEN is not configured in the server environment.' });
   }
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const hf = new HfInference(hfToken);
+    
+    // Using a model highly capable of returning valid JSON
+    const modelId = "Qwen/Qwen2.5-Coder-32B-Instruct"; 
 
     const systemPrompt = `You are an expert data analyst. You are provided with a database schema.
 Your goal is to automatically generate 4 distinct, interesting analytical queries based on this schema to populate a 2x2 dashboard grid.
@@ -47,37 +48,41 @@ Rules:
 Schema:
 ${schema}
 
-Return the results as a JSON array containing exactly 4 objects. Do not use markdown codeblocks. Do not include extra text.
+Return the results EXCLUSIVELY as a raw, minified JSON array containing exactly 4 objects without any markdown formatting, backticks, or explanation.
 Each object must contain these keys: sql_query, chart_type, title, x_axis
-Optional keys: y_axis, color
-`;
+Optional keys: y_axis, color`;
 
-    const result = await model.generateContent({
-      contents: [
-        { role: 'user', parts: [{ text: systemPrompt }] }
+    const response = await hf.chatCompletion({
+      model: modelId,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: "Generate 4 initial insights as a JSON array now." }
       ],
-      generationConfig: {
-        temperature: 0.1, // Slight variation for interesting queries
-        responseMimeType: "application/json"
-      }
+      max_tokens: 1500,
+      temperature: 0.1
     });
 
-    const textResp = result.response.text();
+    let textResp = response.choices[0].message.content.trim();
+    
+    // Clean potential markdown backticks that sometimes leak out
+    if (textResp.startsWith("\`\`\`json")) textResp = textResp.replace(/^\`\`\`json[\n\r]*/, "");
+    if (textResp.startsWith("\`\`\`")) textResp = textResp.replace(/^\`\`\`[\n\r]*/, "");
+    if (textResp.endsWith("\`\`\`")) textResp = textResp.replace(/[\n\r]*\`\`\`$/, "");
+
     let jsonResp;
     try {
         jsonResp = JSON.parse(textResp);
     } catch {
-       return res.status(500).json({ success: false, message: 'Invalid response format from AI.' });
+       return res.status(500).json({ success: false, message: 'Invalid JSON response from AI.' });
     }
 
-    // Wrap the response
     return res.status(200).json({
       success: true,
       insights: jsonResp
     });
 
   } catch (error) {
-    console.error("Gemini API Error (Initial Insights):", error);
-    return res.status(500).json({ success: false, message: 'Error generating auto-insights from AI.' });
+    console.error("Hugging Face API Error (Initial Insights):", error);
+    return res.status(500).json({ success: false, message: 'Error generating auto-insights from Hugging Face AI.' });
   }
 }

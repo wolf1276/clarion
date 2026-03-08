@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { HfInference } from '@huggingface/inference';
 
 export default async function handler(req, res) {
   // CORS setup for local dev, Vercel handles it in production
@@ -24,16 +24,17 @@ export default async function handler(req, res) {
     return res.status(400).json({ success: false, message: 'Schema and query are required' });
   }
 
-  const apiKey = process.env.GOOGLE_API_KEY;
-  console.log("Vercel Query Debug: GOOGLE_API_KEY exists?", !!apiKey);
+  const hfToken = process.env.HF_TOKEN;
 
-  if (!apiKey) {
-    return res.status(500).json({ success: false, message: 'GOOGLE_API_KEY is not configured on the server.' });
+  if (!hfToken) {
+    return res.status(500).json({ success: false, message: 'HF_TOKEN is not configured in the server environment.' });
   }
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const hf = new HfInference(hfToken);
+    
+    // Qwen2.5-Coder is exceptionally good at following strict JSON rules
+    const modelId = "Qwen/Qwen2.5-Coder-32B-Instruct"; 
 
     const systemPrompt = `You are an expert data analyst. You are provided with a database schema.
 Always produce a valid SQLite SELECT query that answers the user's question from a table named 'dataset', and specify the best chart type to visualize the result.
@@ -43,24 +44,34 @@ If the query cannot be answered using the schema, or if the user question is unr
 Schema:
 ${schema}
 
-Output exclusively in minified JSON format. Do not use markdown codeblocks. Do not include extra text.
+Output EXCLUSIVELY in minified JSON format. Do not use markdown codeblocks. Do not include extra text.
 Required JSON keys if successful: sql_query, chart_type
 Optional JSON keys: x_axis, y_axis, color, title
 If returning an error, use JSON key: error`;
 
-    const result = await model.generateContent({
-      contents: [
-        { role: 'user', parts: [{ text: systemPrompt }] },
-        { role: 'user', parts: [{ text: query }] }
+    const response = await hf.chatCompletion({
+      model: modelId,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: query }
       ],
-      generationConfig: {
-        temperature: 0,
-        responseMimeType: "application/json"
-      }
+      max_tokens: 1000,
+      temperature: 0.1
     });
 
-    const textResp = result.response.text();
-    const jsonResp = JSON.parse(textResp);
+    let textResp = response.choices[0].message.content.trim();
+    
+    // Clean potential markdown backticks that sometimes leak out
+    if (textResp.startsWith("\`\`\`json")) textResp = textResp.replace(/^\`\`\`json[\n\r]*/, "");
+    if (textResp.startsWith("\`\`\`")) textResp = textResp.replace(/^\`\`\`[\n\r]*/, "");
+    if (textResp.endsWith("\`\`\`")) textResp = textResp.replace(/[\n\r]*\`\`\`$/, "");
+
+    let jsonResp;
+    try {
+        jsonResp = JSON.parse(textResp);
+    } catch {
+       return res.status(500).json({ success: false, message: 'Invalid JSON response from AI.' });
+    }
 
     if (jsonResp.error) {
        return res.status(200).json({ success: false, message: jsonResp.error });
@@ -79,7 +90,7 @@ If returning an error, use JSON key: error`;
     });
 
   } catch (error) {
-    console.error("Gemini API Error:", error);
-    return res.status(500).json({ success: false, message: 'Error generating response from AI.' });
+    console.error("Hugging Face API Error:", error);
+    return res.status(500).json({ success: false, message: 'Error generating response from Hugging Face AI.' });
   }
 }
