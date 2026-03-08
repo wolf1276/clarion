@@ -457,9 +457,9 @@ function App() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="flex-1 bg-transparent overflow-hidden z-10 flex items-center justify-center p-8"
+          className="flex-1 bg-transparent z-10 p-6 overflow-y-auto"
         >
-          <div className="w-full h-full max-w-6xl max-h-[850px] min-h-[500px] grid grid-cols-1 xl:grid-cols-2 grid-rows-4 xl:grid-rows-2 gap-8 custom-scrollbar pt-2 pr-2 pb-2">
+          <div className="w-full h-full max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-6 content-center">
             <AnimatePresence>
               {[0, 1, 2, 3].map((index) => {
                 const chart = charts[index];
@@ -470,9 +470,9 @@ function App() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ type: "spring", stiffness: 300, damping: 25, delay: index * 0.1 }}
-                    whileHover={{ y: -5, boxShadow: '0 20px 40px rgba(0,0,0,0.06)' }}
+                    whileHover={{ y: -4, boxShadow: '0 20px 40px rgba(0,0,0,0.06)' }}
                     key={chart ? chart.id : `empty-${index}`} 
-                    className="bg-[#FFFFFF]/90 backdrop-blur-sm rounded-xl border border-[#D9D4CB] flex flex-col p-6 w-full h-full transition-all hover:border-[#111111]/30 shadow-[0_4px_20px_rgba(0,0,0,0.02)] relative overflow-hidden group"
+                    className="bg-[#FFFFFF]/90 backdrop-blur-sm rounded-xl border border-[#D9D4CB] flex flex-col p-5 w-full h-[calc(50vh-5rem)] transition-all hover:border-[#111111]/30 shadow-[0_4px_20px_rgba(0,0,0,0.02)] relative overflow-hidden group"
                   >
                     {/* Subtle internal shimmer */}
                     <motion.div
