@@ -121,24 +121,32 @@ const ChartRenderer = ({ config, data }) => {
       // For pie charts, typically x_axis is the name and y_axis is the value
       const valKey = validYKeys[0] || availableKeys[1];
       const nameKey = validXAxis || availableKeys[0];
+      const showLabels = data.length <= 6;
       return (
-        <div className="w-full h-full p-2 flex flex-col items-center">
+        <div className="w-full h-full p-2 flex flex-col items-center overflow-hidden">
           {renderTitle()}
           <ResponsiveContainer width="100%" height="85%">
             <PieChart>
               {renderTooltip()}
-              <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '12px', color: '#555555' }} iconType="circle" />
+              <Legend 
+                wrapperStyle={{ fontSize: '11px', color: '#555555', paddingTop: '5px' }} 
+                iconType="circle" 
+                iconSize={8}
+                layout="horizontal"
+                align="center"
+                verticalAlign="bottom"
+              />
               <Pie
                 data={data}
                 dataKey={valKey}
                 nameKey={nameKey}
                 cx="50%"
-                cy="50%"
-                innerRadius={50}
-                outerRadius={80}
+                cy="45%"
+                innerRadius="35%"
+                outerRadius="55%"
                 fill="#8884d8"
-                paddingAngle={2}
-                label={{ fill: '#555555', fontSize: 11 }}
+                paddingAngle={1}
+                label={showLabels ? { fill: '#555555', fontSize: 10 } : false}
               >
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

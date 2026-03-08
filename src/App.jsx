@@ -423,7 +423,7 @@ function App() {
               return (
                 <div 
                   key={chart ? chart.id : `empty-${index}`} 
-                  className="bg-[#FFFFFF] rounded-xl border border-[#D9D4CB] flex flex-col p-6 w-full h-[400px] xl:h-[calc(50%-1rem)] min-h-[300px]"
+                  className="bg-[#FFFFFF] rounded-xl border border-[#D9D4CB] flex flex-col p-6 w-full h-[400px] xl:h-[calc(50%-1rem)] min-h-[320px] overflow-hidden"
                 >
                   {chart ? (
                     <div className="w-full h-full">
