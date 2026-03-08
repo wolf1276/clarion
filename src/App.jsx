@@ -61,12 +61,15 @@ function App() {
           setSchema(schemaString);
           setMessages([{ 
             role: 'system', 
-            content: `Data uploaded successfully! I'm ready to answer questions about your data.` 
+            content: `Data uploaded successfully! Generating initial insights...` 
           }]);
+          
+          // Trigger automatic insights generation
+          generateInitialInsights(schemaString);
+
         } catch (err) {
           setErrorLine(err.message || 'Error processing CSV.');
-        } finally {
-          setIsUploading(false);
+          setIsUploading(false); // Stop loading here if error
         }
       },
       error: (err) => {
@@ -74,6 +77,71 @@ function App() {
         setIsUploading(false);
       }
     });
+  };
+
+  const generateInitialInsights = async (schemaString) => {
+    setIsQuerying(true);
+    try {
+      const res = await axios.post('/api/initial-insights', { schema: schemaString });
+      
+      if (res.data.success && res.data.insights && Array.isArray(res.data.insights)) {
+        const generatedCharts = [];
+        
+        for (const insight of res.data.insights) {
+          try {
+             // Execute generated SQL locally within browser memory
+             const queryData = alasql(insight.sql_query);
+             
+             if (queryData && queryData.length > 0) {
+                generatedCharts.push({
+                   id: insight.title || Date.now() + Math.random(),
+                   config: {
+                      chart_type: insight.chart_type || 'table',
+                      x_axis: insight.x_axis,
+                      y_axis: insight.y_axis,
+                      color: insight.color,
+                      title: insight.title
+                   },
+                   data: queryData
+                });
+             }
+          } catch (sqlErr) {
+             console.warn("Failed to locally execute auto-generated query:", insight.sql_query, sqlErr);
+          }
+        }
+        
+        if (generatedCharts.length > 0) {
+            setCharts(generatedCharts.slice(0, 4));
+            setMessages(prev => [...prev, {
+              role: 'system',
+              content: `Successfully generated ${generatedCharts.length} automatic insights based on your data!`
+            }]);
+        } else {
+             setMessages(prev => [...prev, {
+              role: 'assistant',
+              content: "I couldn't generate immediate visual insights for this dataset, but you can try asking a query!",
+              isError: true
+            }]);
+        }
+
+      } else {
+        setMessages(prev => [...prev, {
+            role: 'assistant',
+            content: "Failed to generate initial insights.",
+            isError: true
+        }]);
+      }
+    } catch (err) {
+      console.error(err);
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: err.response?.data?.message || "Error generating auto dashboard.",
+        isError: true
+      }]);
+    } finally {
+      setIsQuerying(false);
+      setIsUploading(false); // Done with entire upload flow
+    }
   };
 
   const handleQuery = async (e) => {
