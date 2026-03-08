@@ -25,6 +25,8 @@ export default async function handler(req, res) {
   }
 
   const apiKey = process.env.GOOGLE_API_KEY;
+  console.log("Vercel Query Debug: GOOGLE_API_KEY exists?", !!apiKey);
+
   if (!apiKey) {
     return res.status(500).json({ success: false, message: 'GOOGLE_API_KEY is not configured on the server.' });
   }
