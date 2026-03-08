@@ -1,7 +1,7 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import axios from 'axios';
 
 export default async function handler(req, res) {
-  // CORS setup for local dev, Vercel handles it in production
+  // CORS setup
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader(
@@ -24,18 +24,8 @@ export default async function handler(req, res) {
     return res.status(400).json({ success: false, message: 'Schema and query are required' });
   }
 
-  const apiKey = process.env.GOOGLE_API_KEY;
-  console.log("Vercel Query Debug: GOOGLE_API_KEY exists?", !!apiKey);
-
-  if (!apiKey) {
-    return res.status(500).json({ success: false, message: 'GOOGLE_API_KEY is not configured on the server.' });
-  }
-
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-    const systemPrompt = `You are an expert data analyst. You are provided with a database schema.
+    const systemPrompt = `You are an expert data analyst. You are provided with a database schema and a user question.
 Always produce a valid SQLite SELECT query that answers the user's question from a table named 'dataset', and specify the best chart type to visualize the result.
 Chart type options: 'bar', 'line', 'pie', 'scatter', 'table'.
 If the query cannot be answered using the schema, or if the user question is unrelated to the data, return a minified JSON object with 'error' describing why.
@@ -43,24 +33,31 @@ If the query cannot be answered using the schema, or if the user question is unr
 Schema:
 ${schema}
 
-Output exclusively in minified JSON format. Do not use markdown codeblocks. Do not include extra text.
+User Question: ${query}
+
+Return ONLY a minified JSON object. Do not wrap in markdown. No explanation text. Keep output brief.
 Required JSON keys if successful: sql_query, chart_type
 Optional JSON keys: x_axis, y_axis, color, title
 If returning an error, use JSON key: error`;
 
-    const result = await model.generateContent({
-      contents: [
-        { role: 'user', parts: [{ text: systemPrompt }] },
-        { role: 'user', parts: [{ text: query }] }
-      ],
-      generationConfig: {
-        temperature: 0,
-        responseMimeType: "application/json"
+    const response = await axios.post('http://localhost:11434/api/generate', {
+      model: "llama3", // Ensure user pulls this using: ollama run llama3
+      prompt: systemPrompt,
+      format: "json", // Force Ollama to output valid JSON
+      stream: false,
+      options: {
+        temperature: 0.1
       }
     });
 
-    const textResp = result.response.text();
-    const jsonResp = JSON.parse(textResp);
+    const textResp = response.data.response;
+    let jsonResp = {};
+    
+    try {
+        jsonResp = JSON.parse(textResp);
+    } catch {
+       return res.status(500).json({ success: false, message: 'Invalid response format from Local AI.' });
+    }
 
     if (jsonResp.error) {
        return res.status(200).json({ success: false, message: jsonResp.error });
@@ -79,7 +76,10 @@ If returning an error, use JSON key: error`;
     });
 
   } catch (error) {
-    console.error("Gemini API Error:", error);
-    return res.status(500).json({ success: false, message: 'Error generating response from AI.' });
+    console.error("Ollama API Error:", error.message);
+    return res.status(500).json({ 
+        success: false, 
+        message: 'Failed to connect to Local AI. Please ensure Ollama is running (ollama run llama3) on port 11434.' 
+    });
   }
 }

@@ -1,7 +1,7 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import axios from 'axios';
 
 export default async function handler(req, res) {
-  // CORS setup for local dev, Vercel handles it in production
+  // CORS setup
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader(
@@ -24,60 +24,64 @@ export default async function handler(req, res) {
     return res.status(400).json({ success: false, message: 'Schema is required' });
   }
 
-  const apiKey = process.env.GOOGLE_API_KEY;
-  console.log("Vercel Insights Debug: GOOGLE_API_KEY exists?", !!apiKey);
-
-  if (!apiKey) {
-    return res.status(500).json({ success: false, message: 'GOOGLE_API_KEY is not configured on the server.' });
-  }
-
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
     const systemPrompt = `You are an expert data analyst. You are provided with a database schema.
 Your goal is to automatically generate 4 distinct, interesting analytical queries based on this schema to populate a 2x2 dashboard grid.
 
 Rules:
 1. Always produce a valid SQLite SELECT query from the table named 'dataset'.
-2. Ensure the queries represent DIFFERENT types of analysis (e.g., breakdown by category, trend over time if applicable, top N items, summaries).
+2. Ensure the queries represent DIFFERENT types of analysis (e.g., breakdown by category, top N items, summaries).
 3. Specify the best chart type to visualize each result (options: 'bar', 'line', 'pie', 'scatter', 'table').
-4. Do not hallucinates columns that are not in the schema.
+4. Return ONLY a single JSON array containing exactly 4 objects. Do not wrap it in markdown. No explanation.
 
 Schema:
 ${schema}
 
-Return the results as a JSON array containing exactly 4 objects. Do not use markdown codeblocks. Do not include extra text.
-Each object must contain these keys: sql_query, chart_type, title, x_axis
+Each object in the array must strictly have these string keys: sql_query, chart_type, title, x_axis
 Optional keys: y_axis, color
 `;
 
-    const result = await model.generateContent({
-      contents: [
-        { role: 'user', parts: [{ text: systemPrompt }] }
-      ],
-      generationConfig: {
-        temperature: 0.1, // Slight variation for interesting queries
-        responseMimeType: "application/json"
+    // Local request to Ollama
+    const response = await axios.post('http://localhost:11434/api/generate', {
+      model: "llama3", // The user must pull this using: ollama run llama3
+      prompt: systemPrompt,
+      format: "json", // Force Ollama to output JSON
+      stream: false,
+      options: {
+        temperature: 0.1
       }
     });
 
-    const textResp = result.response.text();
+    const textResp = response.data.response;
+    
     let jsonResp;
     try {
         jsonResp = JSON.parse(textResp);
+        // Sometimes LLMs (even in JSON mode) output a top level object mapping to an array, if they didn't output a raw array
+        if (!Array.isArray(jsonResp)) {
+          // Attempt to extract array if it nested it
+          const keys = Object.keys(jsonResp);
+          for (const key of keys) {
+            if (Array.isArray(jsonResp[key])) {
+                jsonResp = jsonResp[key];
+                break;
+            }
+          }
+        }
     } catch {
-       return res.status(500).json({ success: false, message: 'Invalid response format from AI.' });
+       return res.status(500).json({ success: false, message: 'Invalid response format from Local AI.' });
     }
 
-    // Wrap the response
     return res.status(200).json({
       success: true,
       insights: jsonResp
     });
 
   } catch (error) {
-    console.error("Gemini API Error (Initial Insights):", error);
-    return res.status(500).json({ success: false, message: 'Error generating auto-insights from AI.' });
+    console.error("Ollama API Error (Initial Insights):", error.message);
+    return res.status(500).json({ 
+       success: false, 
+       message: 'Failed to connect to Local AI. Please ensure Ollama is running (ollama run llama3) on port 11434.' 
+    });
   }
 }
