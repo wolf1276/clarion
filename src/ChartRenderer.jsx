@@ -37,6 +37,17 @@ const ChartRenderer = ({ config, data }) => {
      }
   }
 
+  // Format large decimals to prevent UI overlap / number overflow
+  data = data.map(row => {
+    const newRow = { ...row };
+    Object.keys(newRow).forEach(k => {
+      if (typeof newRow[k] === 'number' && !Number.isInteger(newRow[k])) {
+        newRow[k] = parseFloat(newRow[k].toFixed(2));
+      }
+    });
+    return newRow;
+  });
+
   const renderTooltip = () => {
     return <Tooltip contentStyle={{ backgroundColor: '#FFFFFF', border: '1px solid #D9D4CB', borderRadius: '0.5rem', color: '#111111', padding: '10px' }} itemStyle={{ color: '#555555', fontWeight: 500 }} />;
   };
@@ -116,18 +127,18 @@ const ChartRenderer = ({ config, data }) => {
           <ResponsiveContainer width="100%" height="85%">
             <PieChart>
               {renderTooltip()}
-              <Legend iconType="circle" />
+              <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '12px', color: '#555555' }} iconType="circle" />
               <Pie
                 data={data}
                 dataKey={valKey}
                 nameKey={nameKey}
                 cx="50%"
                 cy="50%"
-                innerRadius={60}
-                outerRadius={100}
+                innerRadius={50}
+                outerRadius={80}
                 fill="#8884d8"
                 paddingAngle={2}
-                label={{ fill: '#475569', fontSize: 12 }}
+                label={{ fill: '#555555', fontSize: 11 }}
               >
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
