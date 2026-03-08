@@ -291,7 +291,7 @@ function App() {
 
             {/* Query Section */}
             <div className="mb-6">
-              <h3 className="text-xl font-black mb-3 text-slate-800" style={{fontFamily: 'monospace'}}>Enter query ?</h3>
+              <h3 className="text-xl font-black mb-3 text-slate-800" style={{fontFamily: 'monospace'}}>Enter prompt ?</h3>
               <form onSubmit={handleQuery} className="relative flex items-center">
                 <input
                   type="text"
