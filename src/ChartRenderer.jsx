@@ -4,7 +4,7 @@ import {
   LineChart, Line, PieChart, Pie, Cell, ScatterChart, Scatter
 } from 'recharts';
 
-const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+const COLORS = ['#0c095d', '#3b388b', '#6260ab', '#8c8acc', '#b6b5eb', '#d1cdcd', '#e2e8f9'];
 
 const ChartRenderer = ({ config, data }) => {
   if (!config || !data || data.length === 0) return null;
