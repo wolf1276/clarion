@@ -45,7 +45,29 @@ const ChartRenderer = ({ config, data }) => {
     return title ? <h3 className="text-lg font-bold text-slate-800 mb-4 px-2">{title}</h3> : null;
   };
 
-  switch (chart_type?.toLowerCase()) {
+  // Catch 1x1 scalar result (e.g. SELECT SUM(Revenue) ...)
+  if (data.length === 1 && availableKeys.length === 1) {
+    const singleKey = availableKeys[0];
+    const metricValue = data[0][singleKey];
+    return (
+      <div className="w-full h-full p-6 flex flex-col justify-center items-center text-center">
+        {renderTitle()}
+        <div className="text-slate-500 font-medium mb-4 uppercase tracking-wider text-sm">{singleKey}</div>
+        <div className="text-5xl font-black text-blue-600 drop-shadow-sm">
+           {typeof metricValue === 'number' ? metricValue.toLocaleString() : metricValue}
+        </div>
+      </div>
+    );
+  }
+
+  let finalChartType = chart_type?.toLowerCase() || 'table';
+
+  // Guard against invalid chart properties (e.g. trying to render a bar chart with only 1 column)
+  if (['bar', 'line', 'pie', 'scatter'].includes(finalChartType) && validYKeys.length === 0) {
+      finalChartType = 'table';
+  }
+
+  switch (finalChartType) {
     case 'bar':
       return (
         <div className="w-full h-full p-2 flex flex-col">

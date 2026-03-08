@@ -42,6 +42,7 @@ function App() {
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
+      dynamicTyping: true,
       complete: (results) => {
         try {
           const data = results.data;
@@ -49,9 +50,9 @@ function App() {
             throw new Error('CSV is empty or invalid.');
           }
           
-          // Generate schema
+          // Generate schema mapping types
           const columns = Object.keys(data[0]);
-          const schemaString = `CREATE TABLE dataset (${columns.map(c => `"${c}" TEXT`).join(', ')});`;
+          const schemaString = `CREATE TABLE dataset (${columns.map(c => `"${c}" ${typeof data[0][c] === 'number' ? 'REAL' : 'TEXT'}`).join(', ')});`;
           
           // Load data into locally running AlaSQL
           alasql('DROP TABLE IF EXISTS dataset');
