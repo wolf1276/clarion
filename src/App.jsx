@@ -221,9 +221,7 @@ function App() {
       {/* Header */}
       <header className="w-full bg-white border-b border-slate-200 z-50 px-6 py-4 flex justify-between items-center shadow-sm flex-shrink-0">
         <div className="flex items-center gap-3">
-          <div className="bg-blue-600 p-2 rounded-lg shadow-sm">
-            <Database className="w-5 h-5 text-white" />
-          </div>
+          <img src="/logo.jpg" alt="Clarion Logo" className="w-10 h-10 object-contain rounded-lg shadow-sm bg-white" />
           <h1 className="text-2xl font-black tracking-wider text-blue-600 drop-shadow-sm uppercase">
             CLARION
           </h1>
