@@ -25,8 +25,10 @@ By leveraging **in-browser SQL processing** combined with **Generative AI**, Cla
 
 ### ✨ Key Features
 - **🗣️ Natural Language to SQL:** Ask questions like *"Show me the total sales by region and category"* and watch the magic happen.
+- **⚡ Instant Auto-Insights:** The moment you upload a dataset, Clarion's AI automatically generates 4 distinct, intelligent visualizations and populates a 2x2 dashboard grid before you even type a query.
 - **🔒 100% Private Data Handling:** Your `.csv` file **never** leaves your browser. Parsing and SQL execution happen entirely on the client-side.
 - **⚡ Zero-Latency Analytics:** Because the database lives in browser memory, querying millions of rows happens in milliseconds.
+- **📈 Dynamic Type Casting:** Automatically parses CSV text strings into pure numeric values (`dynamicTyping`), ensuring that Recharts renders math-accurate graphs.
 - **💸 $0 Infrastructure Setup:** Designed to run seamlessly on Vercel's free tier. No persistent databases to manage or pay for.
 
 ---
@@ -46,7 +48,8 @@ graph TD
     end
 
     subgraph Vercel Serverless
-        API[api/query.js]
+        API1[api/initial-insights.js]
+        API2[api/query.js]
     end
 
     subgraph Google Cloud
@@ -54,27 +57,29 @@ graph TD
     end
 
     UI -- 1. Uploads --> CSV
-    CSV -- 2. Parses --> Papa
+    CSV -- 2. Parses (Dynamic Typing) --> Papa
     Papa -- 3. Loads Data --> DB
     Papa -- 4. Extracts Schema --> UI
     
-    UI -- 5. Prompts (Query + Schema) --> API
-    API -- 6. Forwards Auth'd Prompt --> Gemini
-    Gemini -- 7. Returns SQL & Chart Config --> API
-    API -- 8. Returns to Client --> UI
+    UI -- 5. Auto-Prompts (Schema only) --> API1
+    API1 -- 6. Generates 4 SQL Queries --> Gemini
+    UI -- 7. User Prompts (Query + Schema) --> API2
+    API2 -- 8. Forwards Auth'd Prompt --> Gemini
+    Gemini -- 9. Returns SQL & Chart Config --> API2
     
-    UI -- 9. Executes SQL --> DB
-    DB -- 10. Returns Filtered Data --> Recharts
-    Recharts -- 11. Renders 2x2 Grid --> UI
+    UI -- 10. Executes SQL Locally --> DB
+    DB -- 11. Returns Filtered Data --> Recharts
+    Recharts -- 12. Renders Responsive Grid Elements --> UI
 ```
 
 ### The Workflow:
 1. **Upload:** User uploads a `.csv` via the UI. 
-2. **Offline Parsing:** `papaparse` reads the file instantly in the browser.
+2. **Offline Parsing:** `papaparse` reads the file instantly in the browser and dynamically casts types (numbers vs strings).
 3. **Local Database Generation:** `alasql` spins up a virtual SQL database in the browser memory and ingests the parsed data, generating a schema mapping.
-4. **AI Generation:** When the user types a query, the frontend sends the *schema only* (no user data) and the natural language prompt to a lightweight Vercel Serverless Function.
-5. **Secure Execution:** The serverless function securely holds the Google API Key, calls Gemini 2.5 Flash, and returns the constructed SQL query.
-6. **Local Rendering:** The browser executes the SQL against `alasql` and pipes the resulting JSON into our dynamic `recharts` grid.
+4. **Auto-Insights Generation:** Upon successful load, the UI silently pings `/api/initial-insights` with the data schema. The AI creates 4 varied, analytical SQL queries to populate the initial blank canvas.
+5. **Interactive Queries:** When the user types a manual query, the frontend sends the *schema only* (no user data) and the natural language prompt to `/api/query`.
+6. **Secure Execution:** The serverless functions securely hold the Google API Key, call Gemini 2.5 Flash, and return the constructed SQL queries.
+7. **Local Rendering:** The browser executes the SQL against `alasql` and pipes the resulting JSON into our dynamic `recharts` grid with robust fallback key mapping.
 
 ---
 
