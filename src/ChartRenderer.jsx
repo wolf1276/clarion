@@ -11,10 +11,31 @@ const ChartRenderer = ({ config, data }) => {
 
   const { chart_type, x_axis, y_axis, color, title } = config;
 
-  // Determine what keys we are rendering
-  const yKeys = y_axis 
+  // Extract all available columns from the data
+  const availableKeys = data.length > 0 ? Object.keys(data[0]) : [];
+
+  // Robustly determine X axis matching actual data
+  let validXAxis = availableKeys.includes(x_axis) ? x_axis : availableKeys[0];
+
+  // Robustly determine Y axes
+  let rawYKeys = y_axis 
     ? (Array.isArray(y_axis) ? y_axis : y_axis.split(',').map(s => s.trim()))
-    : Object.keys(data[0]).filter(k => k !== x_axis);
+    : availableKeys.filter(k => k !== validXAxis);
+
+  // Use only keys that actually exist, or fallback to sensible defaults
+  let validYKeys = rawYKeys.filter(k => availableKeys.includes(k));
+  if (validYKeys.length === 0) {
+     // Try to find matching keys ignoring case and spaces
+     const normalizedRawY = rawYKeys.map(k => k.toLowerCase().replace(/\s+/g, ''));
+     validYKeys = availableKeys.filter(k => normalizedRawY.includes(k.toLowerCase().replace(/\s+/g, '')));
+     
+     if (validYKeys.length === 0) {
+        validYKeys = availableKeys.filter(k => k !== validXAxis && typeof data[0][k] === 'number');
+        if (validYKeys.length === 0) {
+           validYKeys = availableKeys.filter(k => k !== validXAxis);
+        }
+     }
+  }
 
   const renderTooltip = () => {
     return <Tooltip contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.5rem', color: '#1e293b', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }} itemStyle={{ color: '#475569', fontWeight: 500 }} />;
@@ -32,11 +53,11 @@ const ChartRenderer = ({ config, data }) => {
           <ResponsiveContainer width="100%" height="85%">
             <BarChart data={data} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-              <XAxis dataKey={x_axis} stroke="#64748b" tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
+              <XAxis dataKey={validXAxis} stroke="#64748b" tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
               <YAxis stroke="#64748b" tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
               {renderTooltip()}
               <Legend wrapperStyle={{ paddingTop: '10px' }} iconType="circle" />
-              {yKeys.map((key, index) => (
+              {validYKeys.map((key, index) => (
                 <Bar key={key} dataKey={key} fill={COLORS[index % COLORS.length]} radius={[4, 4, 0, 0]} maxBarSize={50} />
               ))}
             </BarChart>
@@ -51,11 +72,11 @@ const ChartRenderer = ({ config, data }) => {
           <ResponsiveContainer width="100%" height="85%">
             <LineChart data={data} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-              <XAxis dataKey={x_axis} stroke="#64748b" tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
+              <XAxis dataKey={validXAxis} stroke="#64748b" tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
               <YAxis stroke="#64748b" tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
               {renderTooltip()}
               <Legend wrapperStyle={{ paddingTop: '10px' }} iconType="circle" />
-              {yKeys.map((key, index) => (
+              {validYKeys.map((key, index) => (
                 <Line type="monotone" key={key} dataKey={key} stroke={COLORS[index % COLORS.length]} strokeWidth={3} dot={{ r: 4, strokeWidth: 2, fill: '#fff' }} activeDot={{ r: 6, strokeWidth: 0 }} />
               ))}
             </LineChart>
@@ -65,8 +86,8 @@ const ChartRenderer = ({ config, data }) => {
 
     case 'pie':
       // For pie charts, typically x_axis is the name and y_axis is the value
-      const valKey = yKeys[0] || Object.keys(data[0])[1];
-      const nameKey = x_axis || Object.keys(data[0])[0];
+      const valKey = validYKeys[0] || availableKeys[1];
+      const nameKey = validXAxis || availableKeys[0];
       return (
         <div className="w-full h-full p-2 flex flex-col items-center">
           {renderTitle()}
@@ -102,8 +123,8 @@ const ChartRenderer = ({ config, data }) => {
           <ResponsiveContainer width="100%" height="85%">
             <ScatterChart margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-              <XAxis dataKey={x_axis} type="category" stroke="#64748b" name={x_axis} tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
-              <YAxis dataKey={yKeys[0]} type="number" stroke="#64748b" name={yKeys[0]} tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
+              <XAxis dataKey={validXAxis} type="category" stroke="#64748b" name={validXAxis} tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
+              <YAxis dataKey={validYKeys[0]} type="number" stroke="#64748b" name={validYKeys[0]} tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
               {renderTooltip()}
               <Legend iconType="circle" />
               <Scatter name={title || "Data"} data={data} fill={COLORS[0]} />
