@@ -187,15 +187,17 @@ function App() {
           sqlUsed: generatedSql
         }]);
         
-        // Add chart to grid
+        // Add chart to grid (always place user query in the 4th slot)
         setCharts(prev => {
           const newChart = {
             id: Date.now(),
             config: res.data.chart_config,
             data: queryData
           };
-          // Keep only the 4 most recent charts
-          const updatedCharts = [newChart, ...prev].slice(0, 4);
+          // Copy previous charts and explicitly assign the new chart to the bottom-right 4th slot (index 3)
+          const updatedCharts = [...prev];
+          updatedCharts[3] = newChart;
+          
           return updatedCharts;
         });
       } else {
