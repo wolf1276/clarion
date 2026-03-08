@@ -223,7 +223,7 @@ function App() {
       {/* Header */}
       <header className="w-full bg-[#F3EFE7] border-b border-[#D9D4CB] z-50 px-8 py-5 flex justify-between items-center flex-shrink-0">
         <div className="flex items-center gap-4">
-          <img src="/logo.jpg" alt="Clarion Logo" className="w-10 h-10 object-contain rounded-lg border border-[#D9D4CB] bg-white" />
+          <img src="/logo.jpg" alt="Clarion Logo" className="w-11 h-11 object-contain mix-blend-multiply" />
           <h1 className="text-2xl font-bold tracking-tight text-[#111111] uppercase">
             CLARION
           </h1>
