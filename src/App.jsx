@@ -219,22 +219,22 @@ function App() {
   };
 
   return (
-    <div className="h-screen bg-slate-50 text-slate-800 font-sans selection:bg-slate-300/50 overflow-hidden flex flex-col">
+    <div className="h-screen bg-[#F3EFE7] text-[#111111] font-sans selection:bg-[#D9D4CB] overflow-hidden flex flex-col">
       {/* Header */}
-      <header className="w-full bg-white border-b border-slate-200 z-50 px-6 py-4 flex justify-between items-center shadow-sm flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <img src="/logo.jpg" alt="Clarion Logo" className="w-10 h-10 object-contain rounded-lg shadow-sm bg-white" />
-          <h1 className="text-2xl font-black tracking-wider text-slate-800 drop-shadow-sm uppercase">
+      <header className="w-full bg-[#F3EFE7] border-b border-[#D9D4CB] z-50 px-8 py-5 flex justify-between items-center flex-shrink-0">
+        <div className="flex items-center gap-4">
+          <img src="/logo.jpg" alt="Clarion Logo" className="w-10 h-10 object-contain rounded-lg border border-[#D9D4CB] bg-white" />
+          <h1 className="text-2xl font-bold tracking-tight text-[#111111] uppercase">
             CLARION
           </h1>
         </div>
         
-        <h2 className="text-xl font-black tracking-widest text-slate-800 uppercase absolute left-1/2 -translate-x-1/2 hidden md:block" style={{fontFamily: 'monospace'}}>
-          ANALYTICS
+        <h2 className="text-sm font-semibold tracking-[0.2em] text-[#555555] uppercase absolute left-1/2 -translate-x-1/2 hidden md:block">
+          ANALYTICS DASHBOARD
         </h2>
 
-        <div className="text-sm px-3 py-1 bg-white rounded-full border border-slate-200 flex items-center gap-2 shadow-sm font-medium">
-          <div className={`w-2 h-2 rounded-full ${schema ? 'bg-green-500' : 'bg-orange-500'}`}></div>
+        <div className="text-xs px-4 py-1.5 bg-white rounded-full border border-[#D9D4CB] flex items-center gap-2 font-medium text-[#555555]">
+          <div className={`w-2 h-2 rounded-full ${schema ? 'bg-[#000000]' : 'bg-[#D9D4CB]'}`}></div>
           {schema ? 'Data Ready' : 'Awaiting Data'}
         </div>
       </header>
@@ -243,18 +243,18 @@ function App() {
       <main className="flex-1 flex overflow-hidden">
         
         {/* Left Panel - Controls & Chat */}
-        <section className="w-1/3 min-w-[350px] max-w-md bg-white border-r border-slate-200 flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-10">
+        <section className="w-1/3 min-w-[350px] max-w-md bg-[#F3EFE7] border-r border-[#D9D4CB] flex flex-col z-10">
           
-          <div className="p-6 flex flex-col h-full">
+          <div className="p-8 flex flex-col h-full gap-6">
             
             {/* Upload Section */}
             {!schema && (
-               <div className="mb-8 p-6 bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl flex flex-col items-center text-center transition-all hover:border-slate-400 hover:bg-slate-100/50">
-                 <div className="bg-white p-3 rounded-xl mb-3 shadow-sm border border-slate-100">
-                   <UploadCloud className="w-6 h-6 text-slate-700" />
+               <div className="p-8 bg-[#FFFFFF] border border-[#D9D4CB] rounded-xl flex flex-col items-center text-center transition-all hover:border-[#111111]">
+                 <div className="bg-[#F3EFE7] p-4 rounded-full mb-4">
+                   <UploadCloud className="w-6 h-6 text-[#111111]" />
                  </div>
-                 <h2 className="text-lg font-bold mb-1 uppercase tracking-wide">Upload File</h2>
-                 <p className="text-slate-500 text-sm mb-4">
+                 <h2 className="text-base font-bold mb-1 text-[#111111]">Upload Dataset</h2>
+                 <p className="text-[#555555] text-xs mb-6">
                    CSV format only
                  </p>
                  
@@ -266,14 +266,14 @@ function App() {
                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                      disabled={isUploading}
                    />
-                   <div className="bg-white border border-slate-200 rounded-lg py-2 px-4 text-sm font-medium text-slate-700 w-full text-center shadow-sm">
+                   <div className="bg-[#F3EFE7] border border-[#D9D4CB] rounded-lg py-2.5 px-4 text-xs font-semibold text-[#111111] w-full text-center hover:bg-[#EBE5D9] transition-colors">
                      {file ? file.name : 'Choose File'}
                    </div>
                  </div>
                  
                  {errorLine && (
-                   <div className="mt-3 flex items-center gap-2 text-red-500 bg-red-50 px-3 py-1.5 rounded-lg text-xs w-full justify-center">
-                     <AlertCircle className="w-3.5 h-3.5" />
+                   <div className="mt-4 flex items-center gap-2 text-[#111111] bg-[#F3EFE7] px-3 py-2 rounded-lg text-xs w-full justify-center border border-[#D9D4CB]">
+                     <AlertCircle className="w-4 h-4" />
                      {errorLine}
                    </div>
                  )}
@@ -281,45 +281,42 @@ function App() {
                  <button 
                    onClick={handleUpload}
                    disabled={!file || isUploading}
-                   className="mt-4 w-full flex justify-center items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg font-medium transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                   className="mt-6 w-full flex justify-center items-center gap-2 bg-[#000000] hover:bg-[#111111] text-white px-4 py-3 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed text-xs uppercase tracking-wider"
                  >
                    {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                   {isUploading ? 'Analyzing...' : 'Upload & Analyze'}
+                   {isUploading ? 'Analyzing...' : 'Generate Insights'}
                  </button>
                </div>
             )}
 
             {/* Query Section */}
-            <div className="mb-6">
-              <h3 className="text-xl font-black mb-3 text-slate-800" style={{fontFamily: 'monospace'}}>Enter prompt ?</h3>
+            <div className="flex flex-col gap-2">
+              <h3 className="text-sm font-bold text-[#111111] uppercase tracking-wider">Prompt</h3>
               <form onSubmit={handleQuery} className="relative flex items-center">
                 <input
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   disabled={!schema || isQuerying}
-                  placeholder={schema ? "E.g. show sales by region" : "Upload data first"}
-                  className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl py-3 pl-4 pr-12 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-500 focus:ring-4 focus:ring-slate-500/10 transition-all font-medium disabled:opacity-50 shadow-inner"
+                  placeholder={schema ? "Ask a question about your data..." : "Upload data first to prompt"}
+                  className="w-full bg-[#FFFFFF] border border-[#D9D4CB] rounded-xl py-3.5 pl-4 pr-12 text-[#111111] placeholder:text-[#555555] focus:outline-none focus:border-[#000000] transition-colors text-sm disabled:opacity-50"
                 />
                 <button 
                   type="submit" 
                   disabled={!query.trim() || !schema || isQuerying}
-                  className="absolute right-2 p-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition-all shadow-sm disabled:opacity-50 disabled:hover:bg-slate-800"
+                  className="absolute right-2 p-2 bg-[#000000] text-white rounded-lg transition-all disabled:opacity-50"
                 >
                   <Send className="w-4 h-4" />
                 </button>
               </form>
             </div>
 
-            {/* Results Header */}
-            <h3 className="text-xl font-black mb-3 text-slate-800 text-center" style={{fontFamily: 'monospace'}}>Result</h3>
-            
             {/* Chat History / Results */}
-            <div className="flex-1 overflow-y-auto bg-white border-2 border-slate-800 rounded-2xl p-4 shadow-[4px_4px_0_rgba(15,23,42,1)] scrollbar-thin scrollbar-thumb-slate-200">
-              <div className="flex flex-col gap-4">
+            <div className="flex-1 overflow-y-auto bg-[#FFFFFF] border border-[#D9D4CB] rounded-xl p-5 scrollbar-thin scrollbar-thumb-[#D9D4CB]">
+              <div className="flex flex-col gap-5">
                 {messages.length === 0 && (
-                  <div className="text-center text-slate-400 italic text-sm mt-4">
-                    Results will appear here...
+                  <div className="text-center text-[#555555] text-xs mt-4">
+                    Insights will appear here
                   </div>
                 )}
                 
@@ -327,31 +324,31 @@ function App() {
                   <div key={idx} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     
                     {msg.role !== 'user' && (
-                      <div className="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <div className="w-6 h-6 rounded-full bg-[#000000] flex items-center justify-center flex-shrink-0 mt-0.5">
                         <Database className="w-3 h-3 text-white" />
                       </div>
                     )}
       
-                    <div className={`max-w-[85%] rounded-xl p-3 text-sm ${
+                    <div className={`max-w-[85%] rounded-xl p-4 text-sm ${
                       msg.role === 'user' 
-                        ? 'bg-slate-200 text-slate-800 border border-slate-300 rounded-tr-sm' 
-                        : 'bg-slate-50 border border-slate-100 text-slate-700 rounded-tl-sm'
+                        ? 'bg-[#F3EFE7] text-[#111111] border border-[#D9D4CB] rounded-tr-sm' 
+                        : 'bg-[#FFFFFF] border border-[#D9D4CB] text-[#555555] rounded-tl-sm'
                     }`}>
                       
                       {msg.isError ? (
-                        <div className="flex items-start gap-2 text-red-600">
+                        <div className="flex items-start gap-2 text-[#111111] font-medium">
                           <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                           <p>{msg.content}</p>
                         </div>
                       ) : (
-                        <p className="leading-relaxed font-medium">{msg.content}</p>
+                        <p className={`leading-relaxed ${msg.role === 'user' ? 'font-medium' : 'font-normal'}`}>{msg.content}</p>
                       )}
                       
                       {/* SQL Used details */}
                       {msg.sqlUsed && (
-                        <div className="mt-2 pt-2 border-t border-slate-200/60">
-                          <p className="text-[10px] text-slate-400 mb-1 uppercase tracking-wider font-bold">SQL Executed</p>
-                          <pre className="bg-slate-800 p-2 rounded text-[11px] font-mono text-slate-200 overflow-x-auto">
+                        <div className="mt-3 pt-3 border-t border-[#D9D4CB]">
+                          <p className="text-[10px] text-[#555555] mb-2 uppercase tracking-widest font-bold">Query Execution</p>
+                          <pre className="bg-[#F3EFE7] p-3 rounded-lg text-[11px] font-mono text-[#111111] overflow-x-auto border border-[#D9D4CB]">
                             <code>{msg.sqlUsed}</code>
                           </pre>
                         </div>
@@ -362,12 +359,12 @@ function App() {
                 
                 {isQuerying && (
                    <div className="flex gap-3 justify-start">
-                     <div className="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center flex-shrink-0 animate-pulse">
+                     <div className="w-6 h-6 rounded-full bg-[#000000] flex items-center justify-center flex-shrink-0 animate-pulse">
                         <Database className="w-3 h-3 text-white" />
                      </div>
-                     <div className="bg-slate-50 border border-slate-100 text-slate-500 rounded-xl rounded-tl-sm p-3 text-sm flex items-center gap-2 font-medium">
-                       <Loader2 className="w-4 h-4 animate-spin text-slate-500" />
-                       Analyzing...
+                     <div className="bg-[#FFFFFF] border border-[#D9D4CB] text-[#555555] rounded-xl rounded-tl-sm p-4 text-sm flex items-center gap-3">
+                       <Loader2 className="w-4 h-4 animate-spin text-[#000000]" />
+                       Processing...
                      </div>
                    </div>
                 )}
@@ -379,24 +376,24 @@ function App() {
         </section>
 
         {/* Right Panel - 2x2 Analytics Grid */}
-        <section className="flex-1 bg-slate-100/50 p-6 overflow-y-auto">
-          <div className="h-full w-full max-w-5xl mx-auto grid grid-cols-1 xl:grid-cols-2 grid-rows-2 gap-6 pb-20 xl:pb-0">
+        <section className="flex-1 bg-[#F3EFE7] p-8 overflow-y-auto">
+          <div className="h-full w-full max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-2 grid-rows-2 gap-8 pb-20 xl:pb-0">
             {[0, 1, 2, 3].map((index) => {
               const chart = charts[index];
               return (
                 <div 
                   key={chart ? chart.id : `empty-${index}`} 
-                  className="bg-white rounded-[2rem] border-2 border-slate-800 shadow-[4px_4px_0_rgba(15,23,42,1)] overflow-hidden flex flex-col p-4 w-full h-[400px] xl:h-auto min-h-[300px]"
+                  className="bg-[#FFFFFF] rounded-xl border border-[#D9D4CB] flex flex-col p-6 w-full h-[400px] xl:h-[calc(50%-1rem)] min-h-[300px]"
                 >
                   {chart ? (
                     <div className="w-full h-full">
                       <ChartRenderer config={chart.config} data={chart.data} />
                     </div>
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/50">
-                      <p className="text-slate-400 font-medium text-sm flex items-center gap-2">
+                    <div className="w-full h-full flex items-center justify-center border border-dashed border-[#D9D4CB] rounded-lg bg-[#F3EFE7]/50">
+                      <p className="text-[#555555] font-medium text-sm flex items-center gap-2">
                         <Database className="w-4 h-4 opacity-50" />
-                        Empty Slot
+                        Awaiting visualization
                       </p>
                     </div>
                   )}

@@ -4,7 +4,7 @@ import {
   LineChart, Line, PieChart, Pie, Cell, ScatterChart, Scatter
 } from 'recharts';
 
-const COLORS = ['#0f172a', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1', '#e2e8f0'];
+const COLORS = ['#111111', '#555555', '#777777', '#999999', '#BBBBBB', '#DDDDDD'];
 
 const ChartRenderer = ({ config, data }) => {
   if (!config || !data || data.length === 0) return null;
@@ -38,11 +38,11 @@ const ChartRenderer = ({ config, data }) => {
   }
 
   const renderTooltip = () => {
-    return <Tooltip contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.5rem', color: '#1e293b', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }} itemStyle={{ color: '#475569', fontWeight: 500 }} />;
+    return <Tooltip contentStyle={{ backgroundColor: '#FFFFFF', border: '1px solid #D9D4CB', borderRadius: '0.5rem', color: '#111111', padding: '10px' }} itemStyle={{ color: '#555555', fontWeight: 500 }} />;
   };
 
   const renderTitle = () => {
-    return title ? <h3 className="text-lg font-bold text-slate-800 mb-4 px-2">{title}</h3> : null;
+    return title ? <h3 className="text-base font-bold text-[#111111] mb-6 px-2">{title}</h3> : null;
   };
 
   // Catch 1x1 scalar result (e.g. SELECT SUM(Revenue) ...)
@@ -52,8 +52,8 @@ const ChartRenderer = ({ config, data }) => {
     return (
       <div className="w-full h-full p-6 flex flex-col justify-center items-center text-center">
         {renderTitle()}
-        <div className="text-slate-500 font-medium mb-4 uppercase tracking-wider text-sm">{singleKey}</div>
-        <div className="text-5xl font-black text-slate-800 drop-shadow-sm">
+        <div className="text-[#555555] font-medium mb-4 uppercase tracking-widest text-xs">{singleKey}</div>
+        <div className="text-6xl font-bold text-[#111111]">
            {typeof metricValue === 'number' ? metricValue.toLocaleString() : metricValue}
         </div>
       </div>
@@ -73,14 +73,14 @@ const ChartRenderer = ({ config, data }) => {
         <div className="w-full h-full p-2 flex flex-col">
           {renderTitle()}
           <ResponsiveContainer width="100%" height="85%">
-            <BarChart data={data} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-              <XAxis dataKey={validXAxis} stroke="#64748b" tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
-              <YAxis stroke="#64748b" tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
+            <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#D9D4CB" vertical={false} />
+              <XAxis dataKey={validXAxis} stroke="#555555" tick={{fill: '#555555', fontSize: 11}} axisLine={{stroke: '#D9D4CB'}} tickLine={false} />
+              <YAxis stroke="#555555" tick={{fill: '#555555', fontSize: 11}} axisLine={false} tickLine={false} />
               {renderTooltip()}
-              <Legend wrapperStyle={{ paddingTop: '10px' }} iconType="circle" />
+              <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '12px', color: '#555555' }} iconType="circle" />
               {validYKeys.map((key, index) => (
-                <Bar key={key} dataKey={key} fill={COLORS[index % COLORS.length]} radius={[4, 4, 0, 0]} maxBarSize={50} />
+                <Bar key={key} dataKey={key} fill={COLORS[index % COLORS.length]} radius={[4, 4, 0, 0]} maxBarSize={40} />
               ))}
             </BarChart>
           </ResponsiveContainer>
@@ -92,14 +92,14 @@ const ChartRenderer = ({ config, data }) => {
         <div className="w-full h-full p-2 flex flex-col">
           {renderTitle()}
           <ResponsiveContainer width="100%" height="85%">
-            <LineChart data={data} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-              <XAxis dataKey={validXAxis} stroke="#64748b" tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
-              <YAxis stroke="#64748b" tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
+            <LineChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#D9D4CB" vertical={false} />
+              <XAxis dataKey={validXAxis} stroke="#555555" tick={{fill: '#555555', fontSize: 11}} axisLine={{stroke: '#D9D4CB'}} tickLine={false} />
+              <YAxis stroke="#555555" tick={{fill: '#555555', fontSize: 11}} axisLine={false} tickLine={false} />
               {renderTooltip()}
-              <Legend wrapperStyle={{ paddingTop: '10px' }} iconType="circle" />
+              <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '12px', color: '#555555' }} iconType="circle" />
               {validYKeys.map((key, index) => (
-                <Line type="monotone" key={key} dataKey={key} stroke={COLORS[index % COLORS.length]} strokeWidth={3} dot={{ r: 4, strokeWidth: 2, fill: '#fff' }} activeDot={{ r: 6, strokeWidth: 0 }} />
+                <Line type="monotone" key={key} dataKey={key} stroke={COLORS[index % COLORS.length]} strokeWidth={2} dot={{ r: 3, strokeWidth: 1, fill: '#fff' }} activeDot={{ r: 5, strokeWidth: 0 }} />
               ))}
             </LineChart>
           </ResponsiveContainer>
@@ -143,12 +143,12 @@ const ChartRenderer = ({ config, data }) => {
         <div className="w-full h-full p-2 flex flex-col">
           {renderTitle()}
           <ResponsiveContainer width="100%" height="85%">
-            <ScatterChart margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-              <XAxis dataKey={validXAxis} type="category" stroke="#64748b" name={validXAxis} tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
-              <YAxis dataKey={validYKeys[0]} type="number" stroke="#64748b" name={validYKeys[0]} tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} />
+            <ScatterChart margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#D9D4CB" vertical={false} />
+              <XAxis dataKey={validXAxis} type="category" stroke="#555555" name={validXAxis} tick={{fill: '#555555', fontSize: 11}} axisLine={{stroke: '#D9D4CB'}} tickLine={false} />
+              <YAxis dataKey={validYKeys[0]} type="number" stroke="#555555" name={validYKeys[0]} tick={{fill: '#555555', fontSize: 11}} axisLine={false} tickLine={false} />
               {renderTooltip()}
-              <Legend iconType="circle" />
+              <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '12px', color: '#555555' }} iconType="circle" />
               <Scatter name={title || "Data"} data={data} fill={COLORS[0]} />
             </ScatterChart>
           </ResponsiveContainer>
@@ -162,17 +162,17 @@ const ChartRenderer = ({ config, data }) => {
       return (
         <div className="w-full h-full p-4 overflow-x-auto">
           {renderTitle()}
-          <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-            <table className="min-w-full text-left text-sm text-slate-600">
-              <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-200">
+          <div className="border border-[#D9D4CB] rounded-xl overflow-hidden">
+            <table className="min-w-full text-left text-sm text-[#555555]">
+              <thead className="text-xs text-[#555555] uppercase bg-[#F3EFE7] border-b border-[#D9D4CB]">
                 <tr>
-                  {cols.map(col => <th key={col} className="px-6 py-3 font-bold tracking-wider">{col}</th>)}
+                  {cols.map(col => <th key={col} className="px-6 py-4 font-bold tracking-wider">{col}</th>)}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-slate-100">
+              <tbody className="bg-[#FFFFFF] divide-y divide-[#D9D4CB] text-[#111111]">
                 {data.map((row, i) => (
-                  <tr key={i} className="hover:bg-slate-50/50 transition-colors">
-                    {cols.map(col => <td key={`${i}-${col}`} className="px-6 py-3 whitespace-nowrap">{row[col]}</td>)}
+                  <tr key={i} className="hover:bg-[#F3EFE7]/50 transition-colors">
+                    {cols.map(col => <td key={`${i}-${col}`} className="px-6 py-4 whitespace-nowrap">{row[col]}</td>)}
                   </tr>
                 ))}
               </tbody>
