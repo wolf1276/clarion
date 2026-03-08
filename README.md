@@ -184,7 +184,3 @@ Clarion uses **Qwen2.5-Coder-32B-Instruct** hosted on Hugging Face's free Server
 > **Note:** Clarion was previously powered by Google Gemini 2.5 Flash. The migration to Hugging Face was done to eliminate API rate limits (`429 Too Many Requests`) encountered on Google's free tier, providing a truly unlimited free experience.
 
 ---
-
-<div align="center">
-  <p>Thanku Team CLARION❤️</p>
-</div>
