@@ -1,6 +1,0 @@
-[dotenv@17.3.1] injecting env (1) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
-Mock Vercel API Server running on port 3000
-Vercel Query Debug: GOOGLE_API_KEY exists? true
-Vercel Insights Debug: GOOGLE_API_KEY exists? true
-Vercel Query Debug: GOOGLE_API_KEY exists? true
-Vercel Insights Debug: GOOGLE_API_KEY exists? true
