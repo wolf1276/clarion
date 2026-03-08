@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
-import { UploadCloud, MessageSquare, Send, Database, Loader2, AlertCircle } from 'lucide-react';
+import { UploadCloud, MessageSquare, Send, Database, Loader2, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import ChartRenderer from './ChartRenderer';
 import Papa from 'papaparse';
 import alasql from 'alasql';
@@ -14,6 +14,7 @@ function App() {
   const [isUploading, setIsUploading] = useState(false);
   const [isQuerying, setIsQuerying] = useState(false);
   const [errorLine, setErrorLine] = useState('');
+  const [resultIndex, setResultIndex] = useState(0);
 
   const messagesEndRef = useRef(null);
 
@@ -24,6 +25,12 @@ function App() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      setResultIndex(messages.length - 1);
+    }
+  }, [messages.length]);
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -243,18 +250,18 @@ function App() {
       <main className="flex-1 flex overflow-hidden">
         
         {/* Left Panel - Controls & Chat */}
-        <section className="w-1/3 min-w-[350px] max-w-md bg-[#F3EFE7] border-r border-[#D9D4CB] flex flex-col z-10">
+        <section className="w-[38%] min-w-[380px] max-w-lg bg-[#F3EFE7] border-r border-[#D9D4CB] flex flex-col z-10">
           
-          <div className="p-8 flex flex-col h-full gap-6">
+          <div className="p-6 flex flex-col h-full gap-4">
             
             {/* Upload Section */}
             {!schema && (
-               <div className="p-8 bg-[#FFFFFF] border border-[#D9D4CB] rounded-xl flex flex-col items-center text-center transition-all hover:border-[#111111]">
-                 <div className="bg-[#F3EFE7] p-4 rounded-full mb-4">
-                   <UploadCloud className="w-6 h-6 text-[#111111]" />
+               <div className="p-6 bg-[#FFFFFF] border border-[#D9D4CB] rounded-xl flex flex-col items-center text-center transition-all hover:border-[#111111]">
+                 <div className="bg-[#F3EFE7] p-3 rounded-full mb-3">
+                   <UploadCloud className="w-5 h-5 text-[#111111]" />
                  </div>
-                 <h2 className="text-base font-bold mb-1 text-[#111111]">Upload Dataset</h2>
-                 <p className="text-[#555555] text-xs mb-6">
+                 <h2 className="text-sm font-bold mb-1 text-[#111111]">Upload Dataset</h2>
+                 <p className="text-[#555555] text-xs mb-4">
                    CSV format only
                  </p>
                  
@@ -266,13 +273,13 @@ function App() {
                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                      disabled={isUploading}
                    />
-                   <div className="bg-[#F3EFE7] border border-[#D9D4CB] rounded-lg py-2.5 px-4 text-xs font-semibold text-[#111111] w-full text-center hover:bg-[#EBE5D9] transition-colors">
+                   <div className="bg-[#F3EFE7] border border-[#D9D4CB] rounded-lg py-2 px-4 text-xs font-semibold text-[#111111] w-full text-center hover:bg-[#EBE5D9] transition-colors">
                      {file ? file.name : 'Choose File'}
                    </div>
                  </div>
                  
                  {errorLine && (
-                   <div className="mt-4 flex items-center gap-2 text-[#111111] bg-[#F3EFE7] px-3 py-2 rounded-lg text-xs w-full justify-center border border-[#D9D4CB]">
+                   <div className="mt-3 flex items-center gap-2 text-[#111111] bg-[#F3EFE7] px-3 py-2 rounded-lg text-xs w-full justify-center border border-[#D9D4CB]">
                      <AlertCircle className="w-4 h-4" />
                      {errorLine}
                    </div>
@@ -281,7 +288,7 @@ function App() {
                  <button 
                    onClick={handleUpload}
                    disabled={!file || isUploading}
-                   className="mt-6 w-full flex justify-center items-center gap-2 bg-[#000000] hover:bg-[#111111] text-white px-4 py-3 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed text-xs uppercase tracking-wider"
+                   className="mt-4 w-full flex justify-center items-center gap-2 bg-[#000000] hover:bg-[#111111] text-white px-4 py-2.5 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed text-xs uppercase tracking-wider"
                  >
                    {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                    {isUploading ? 'Analyzing...' : 'Generate Insights'}
@@ -290,8 +297,8 @@ function App() {
             )}
 
             {/* Query Section */}
-            <div className="flex flex-col gap-2">
-              <h3 className="text-sm font-bold text-[#111111] uppercase tracking-wider">Prompt</h3>
+            <div className="flex flex-col gap-1.5 flex-shrink-0">
+              <h3 className="text-xs font-bold text-[#111111] uppercase tracking-wider">Prompt</h3>
               <form onSubmit={handleQuery} className="relative flex items-center">
                 <input
                   type="text"
@@ -299,7 +306,7 @@ function App() {
                   onChange={(e) => setQuery(e.target.value)}
                   disabled={!schema || isQuerying}
                   placeholder={schema ? "Ask a question about your data..." : "Upload data first to prompt"}
-                  className="w-full bg-[#FFFFFF] border border-[#D9D4CB] rounded-xl py-3.5 pl-4 pr-12 text-[#111111] placeholder:text-[#555555] focus:outline-none focus:border-[#000000] transition-colors text-sm disabled:opacity-50"
+                  className="w-full bg-[#FFFFFF] border border-[#D9D4CB] rounded-xl py-3 pl-4 pr-12 text-[#111111] placeholder:text-[#555555] focus:outline-none focus:border-[#000000] transition-colors text-sm disabled:opacity-50"
                 />
                 <button 
                   type="submit" 
@@ -311,64 +318,97 @@ function App() {
               </form>
             </div>
 
-            {/* Chat History / Results */}
-            <div className="flex-1 overflow-y-auto bg-[#FFFFFF] border border-[#D9D4CB] rounded-xl p-5 scrollbar-thin scrollbar-thumb-[#D9D4CB]">
-              <div className="flex flex-col gap-5">
-                {messages.length === 0 && (
-                  <div className="text-center text-[#555555] text-xs mt-4">
-                    Insights will appear here
+            {/* Results Panel with Navigation */}
+            <div className="flex-1 flex flex-col min-h-0">
+              {/* Results Header with Navigation */}
+              <div className="flex items-center justify-between mb-2 flex-shrink-0">
+                <h3 className="text-xs font-bold text-[#111111] uppercase tracking-wider">Results</h3>
+                {messages.length > 1 && (
+                  <div className="flex items-center gap-1">
+                    <button 
+                      onClick={() => setResultIndex(Math.max(0, resultIndex - 1))}
+                      disabled={resultIndex === 0}
+                      className="p-1 rounded-lg border border-[#D9D4CB] hover:bg-[#EBE5D9] transition-colors disabled:opacity-30"
+                    >
+                      <ChevronLeft className="w-4 h-4 text-[#111111]" />
+                    </button>
+                    <span className="text-[10px] font-semibold text-[#555555] tabular-nums min-w-[3rem] text-center">
+                      {resultIndex + 1} / {messages.length}
+                    </span>
+                    <button 
+                      onClick={() => setResultIndex(Math.min(messages.length - 1, resultIndex + 1))}
+                      disabled={resultIndex >= messages.length - 1}
+                      className="p-1 rounded-lg border border-[#D9D4CB] hover:bg-[#EBE5D9] transition-colors disabled:opacity-30"
+                    >
+                      <ChevronRight className="w-4 h-4 text-[#111111]" />
+                    </button>
                   </div>
                 )}
-                
-                {messages.map((msg, idx) => (
-                  <div key={idx} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    
-                    {msg.role !== 'user' && (
-                      <div className="w-6 h-6 rounded-full bg-[#000000] flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <Database className="w-3 h-3 text-white" />
-                      </div>
-                    )}
-      
-                    <div className={`max-w-[85%] rounded-xl p-4 text-sm ${
-                      msg.role === 'user' 
-                        ? 'bg-[#F3EFE7] text-[#111111] border border-[#D9D4CB] rounded-tr-sm' 
-                        : 'bg-[#FFFFFF] border border-[#D9D4CB] text-[#555555] rounded-tl-sm'
-                    }`}>
-                      
-                      {msg.isError ? (
-                        <div className="flex items-start gap-2 text-[#111111] font-medium">
-                          <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                          <p>{msg.content}</p>
-                        </div>
-                      ) : (
-                        <p className={`leading-relaxed ${msg.role === 'user' ? 'font-medium' : 'font-normal'}`}>{msg.content}</p>
-                      )}
-                      
-                      {/* SQL Used details */}
-                      {msg.sqlUsed && (
-                        <div className="mt-3 pt-3 border-t border-[#D9D4CB]">
-                          <p className="text-[10px] text-[#555555] mb-2 uppercase tracking-widest font-bold">Query Execution</p>
-                          <pre className="bg-[#F3EFE7] p-3 rounded-lg text-[11px] font-mono text-[#111111] overflow-x-auto border border-[#D9D4CB]">
-                            <code>{msg.sqlUsed}</code>
-                          </pre>
-                        </div>
-                      )}
+              </div>
+
+              {/* Results Content */}
+              <div className="flex-1 overflow-y-auto bg-[#FFFFFF] border border-[#D9D4CB] rounded-xl p-5 scrollbar-thin scrollbar-thumb-[#D9D4CB]">
+                <div className="flex flex-col gap-4">
+                  {messages.length === 0 && (
+                    <div className="text-center text-[#555555] text-xs mt-4">
+                      Insights will appear here
                     </div>
-                  </div>
-                ))}
-                
-                {isQuerying && (
-                   <div className="flex gap-3 justify-start">
-                     <div className="w-6 h-6 rounded-full bg-[#000000] flex items-center justify-center flex-shrink-0 animate-pulse">
-                        <Database className="w-3 h-3 text-white" />
+                  )}
+                  
+                  {messages.length > 0 && (() => {
+                    const msg = messages[resultIndex];
+                    if (!msg) return null;
+                    return (
+                      <div className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        
+                        {msg.role !== 'user' && (
+                          <div className="w-6 h-6 rounded-full bg-[#000000] flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Database className="w-3 h-3 text-white" />
+                          </div>
+                        )}
+      
+                        <div className={`w-full rounded-xl p-4 text-sm ${
+                          msg.role === 'user' 
+                            ? 'bg-[#F3EFE7] text-[#111111] border border-[#D9D4CB] rounded-tr-sm' 
+                            : 'bg-[#FFFFFF] border border-[#D9D4CB] text-[#555555] rounded-tl-sm'
+                        }`}>
+                          
+                          {msg.isError ? (
+                            <div className="flex items-start gap-2 text-[#111111] font-medium">
+                              <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                              <p>{msg.content}</p>
+                            </div>
+                          ) : (
+                            <p className={`leading-relaxed ${msg.role === 'user' ? 'font-medium' : 'font-normal'}`}>{msg.content}</p>
+                          )}
+                          
+                          {/* SQL Used details */}
+                          {msg.sqlUsed && (
+                            <div className="mt-3 pt-3 border-t border-[#D9D4CB]">
+                              <p className="text-[10px] text-[#555555] mb-2 uppercase tracking-widest font-bold">Query Execution</p>
+                              <pre className="bg-[#F3EFE7] p-3 rounded-lg text-[11px] font-mono text-[#111111] overflow-x-auto border border-[#D9D4CB] whitespace-pre-wrap break-all">
+                                <code>{msg.sqlUsed}</code>
+                              </pre>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                  
+                  {isQuerying && (
+                     <div className="flex gap-3 justify-start">
+                       <div className="w-6 h-6 rounded-full bg-[#000000] flex items-center justify-center flex-shrink-0 animate-pulse">
+                          <Database className="w-3 h-3 text-white" />
+                       </div>
+                       <div className="bg-[#FFFFFF] border border-[#D9D4CB] text-[#555555] rounded-xl rounded-tl-sm p-4 text-sm flex items-center gap-3">
+                         <Loader2 className="w-4 h-4 animate-spin text-[#000000]" />
+                         Processing...
+                       </div>
                      </div>
-                     <div className="bg-[#FFFFFF] border border-[#D9D4CB] text-[#555555] rounded-xl rounded-tl-sm p-4 text-sm flex items-center gap-3">
-                       <Loader2 className="w-4 h-4 animate-spin text-[#000000]" />
-                       Processing...
-                     </div>
-                   </div>
-                )}
-                <div ref={messagesEndRef} />
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
               </div>
             </div>
 
