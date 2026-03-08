@@ -457,9 +457,9 @@ function App() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="flex-1 bg-transparent overflow-y-auto z-10 custom-scrollbar flex items-center justify-center p-8"
+          className="flex-1 bg-transparent overflow-hidden z-10 flex items-center justify-center p-8"
         >
-          <div className="w-full max-w-6xl aspect-[4/3] max-h-[900px] min-h-[600px] grid grid-cols-1 xl:grid-cols-2 grid-rows-4 xl:grid-rows-2 gap-8">
+          <div className="w-full h-full max-w-6xl max-h-[850px] min-h-[500px] grid grid-cols-1 xl:grid-cols-2 grid-rows-4 xl:grid-rows-2 gap-8 custom-scrollbar pt-2 pr-2 pb-2">
             <AnimatePresence>
               {[0, 1, 2, 3].map((index) => {
                 const chart = charts[index];
