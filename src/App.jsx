@@ -219,12 +219,12 @@ function App() {
   };
 
   return (
-    <div className="h-screen bg-slate-50 text-slate-800 font-sans selection:bg-blue-500/30 overflow-hidden flex flex-col">
+    <div className="h-screen bg-slate-50 text-slate-800 font-sans selection:bg-slate-300/50 overflow-hidden flex flex-col">
       {/* Header */}
       <header className="w-full bg-white border-b border-slate-200 z-50 px-6 py-4 flex justify-between items-center shadow-sm flex-shrink-0">
         <div className="flex items-center gap-3">
           <img src="/logo.jpg" alt="Clarion Logo" className="w-10 h-10 object-contain rounded-lg shadow-sm bg-white" />
-          <h1 className="text-2xl font-black tracking-wider text-blue-600 drop-shadow-sm uppercase">
+          <h1 className="text-2xl font-black tracking-wider text-slate-800 drop-shadow-sm uppercase">
             CLARION
           </h1>
         </div>
@@ -249,7 +249,7 @@ function App() {
             
             {/* Upload Section */}
             {!schema && (
-               <div className="mb-8 p-6 bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl flex flex-col items-center text-center transition-all hover:border-blue-400 hover:bg-blue-50/50">
+               <div className="mb-8 p-6 bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl flex flex-col items-center text-center transition-all hover:border-slate-400 hover:bg-slate-100/50">
                  <div className="bg-white p-3 rounded-xl mb-3 shadow-sm border border-slate-100">
                    <UploadCloud className="w-6 h-6 text-slate-700" />
                  </div>
@@ -299,12 +299,12 @@ function App() {
                   onChange={(e) => setQuery(e.target.value)}
                   disabled={!schema || isQuerying}
                   placeholder={schema ? "E.g. show sales by region" : "Upload data first"}
-                  className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl py-3 pl-4 pr-12 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all font-medium disabled:opacity-50 shadow-inner"
+                  className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl py-3 pl-4 pr-12 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-500 focus:ring-4 focus:ring-slate-500/10 transition-all font-medium disabled:opacity-50 shadow-inner"
                 />
                 <button 
                   type="submit" 
                   disabled={!query.trim() || !schema || isQuerying}
-                  className="absolute right-2 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all shadow-sm disabled:opacity-50 disabled:hover:bg-blue-600"
+                  className="absolute right-2 p-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition-all shadow-sm disabled:opacity-50 disabled:hover:bg-slate-800"
                 >
                   <Send className="w-4 h-4" />
                 </button>
@@ -334,7 +334,7 @@ function App() {
       
                     <div className={`max-w-[85%] rounded-xl p-3 text-sm ${
                       msg.role === 'user' 
-                        ? 'bg-blue-50 text-blue-900 border border-blue-100 rounded-tr-sm' 
+                        ? 'bg-slate-200 text-slate-800 border border-slate-300 rounded-tr-sm' 
                         : 'bg-slate-50 border border-slate-100 text-slate-700 rounded-tl-sm'
                     }`}>
                       
@@ -366,7 +366,7 @@ function App() {
                         <Database className="w-3 h-3 text-white" />
                      </div>
                      <div className="bg-slate-50 border border-slate-100 text-slate-500 rounded-xl rounded-tl-sm p-3 text-sm flex items-center gap-2 font-medium">
-                       <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                       <Loader2 className="w-4 h-4 animate-spin text-slate-500" />
                        Analyzing...
                      </div>
                    </div>
@@ -379,7 +379,7 @@ function App() {
         </section>
 
         {/* Right Panel - 2x2 Analytics Grid */}
-        <section className="flex-1 bg-blue-100/50 p-6 overflow-y-auto">
+        <section className="flex-1 bg-slate-100/50 p-6 overflow-y-auto">
           <div className="h-full w-full max-w-5xl mx-auto grid grid-cols-1 xl:grid-cols-2 grid-rows-2 gap-6 pb-20 xl:pb-0">
             {[0, 1, 2, 3].map((index) => {
               const chart = charts[index];

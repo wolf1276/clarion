@@ -1,25 +1,13 @@
 @import "tailwindcss";
 
-@theme {
-  --color-blue-50: #f2f2fa;
-  --color-blue-100: #e5e5f5;
-  --color-blue-400: #2d2794;
-  --color-blue-500: #1a157d;
-  --color-blue-600: #0c095d;
-  --color-blue-700: #09064a;
-  --color-blue-900: #04032a;
-  
-  --color-slate-800: #0c095d; /* Also tint the dark slate to match the brand */
-}
-
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light;
-  color: #0c095d;
-  background-color: #f8fafc;
+  color: #0f172a; /* Slate 900 */
+  background-color: #f8fafc; /* Slate 50 */
 }
 
 body {

@@ -4,7 +4,7 @@ import {
   LineChart, Line, PieChart, Pie, Cell, ScatterChart, Scatter
 } from 'recharts';
 
-const COLORS = ['#0c095d', '#3b388b', '#6260ab', '#8c8acc', '#b6b5eb', '#d1cdcd', '#e2e8f9'];
+const COLORS = ['#0f172a', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1', '#e2e8f0'];
 
 const ChartRenderer = ({ config, data }) => {
   if (!config || !data || data.length === 0) return null;
@@ -53,7 +53,7 @@ const ChartRenderer = ({ config, data }) => {
       <div className="w-full h-full p-6 flex flex-col justify-center items-center text-center">
         {renderTitle()}
         <div className="text-slate-500 font-medium mb-4 uppercase tracking-wider text-sm">{singleKey}</div>
-        <div className="text-5xl font-black text-blue-600 drop-shadow-sm">
+        <div className="text-5xl font-black text-slate-800 drop-shadow-sm">
            {typeof metricValue === 'number' ? metricValue.toLocaleString() : metricValue}
         </div>
       </div>
